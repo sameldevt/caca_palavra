@@ -3,133 +3,25 @@ package br.com.magna.caca_palavra.entities;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class Table {
+	
 	private char[][] matrix = new char[26][26];
 	private List<String> words = new ArrayList<String>();
-	private List<String> foundWords = new ArrayList<String>();
-	private Map<Character, Integer> map = new HashMap<>();
-    private Pattern pattern = Pattern.compile("[a-zA-Z][0123456789]{2}");
 	
 	public Table() {
-		fillWordList();
-		initiateMatrix();
-		setRandomWords();
-		fillMap();
+		loadContent();
 	}
 	
-	private void clear() {for(int i = 0; i<50; i++) {System.out.println();}}
-	
-	private void printFoundWords() {
-		for(String s : foundWords) {
-			System.out.print(s + " ");
-		}
-	}
-	private void fillMap() {
-		Character character = 65;
-		for(int i = 0; i < 26; i++) {
-			map.put(character, i);
-			character++;
-		}
+	public char[][] getMatrix(){
+		return matrix;
 	}
 	
-	private void printWin() {
-		try(Scanner scan = new Scanner(new File("util/win.txt"))){
-			while(scan.hasNext()) {
-				System.out.println(scan.nextLine());
-			}
-			System.out.println();
-		}
-		catch(IOException e) {
-			
-		}
-	}
-	
-	public boolean guessWord() {
-		Scanner scan = new Scanner(System.in);
-		System.out.println("cords (A01-B02)");
-		System.out.print("> ");
-		String input = scan.nextLine();
-		
-		if(pattern.matcher(input).find()) {
-			String formatedInput = input.toUpperCase();
-			
-			Character pos1LineChar = formatedInput.charAt(0);
-			Integer pos1Column = Integer.parseInt(formatedInput.substring(1, 3));
-			
-			Character pos2LineChar = formatedInput.charAt(4);
-			Integer pos2Column = Integer.parseInt(formatedInput.substring(5, 7));
-			
-			Integer pos1Line = map.get(pos1LineChar);
-			Integer pos2Line = map.get(pos2LineChar);
-			
-			String secretWord = "";
-			
-			// check column
-			if(pos1Line != pos2Line && pos1Column == pos2Column) {
-				try {
-					for(int line = pos1Line; line <= pos2Line; line++) {
-						secretWord += matrix[line][pos1Column];
-					}
-				}
-				catch(ArrayIndexOutOfBoundsException e) {
-					System.out.println("Posição inválida!");
-					return false;
-				}
-				
-				if(words.contains(secretWord)) {
-					for(int line = pos1Line; line <= pos2Line; line++) {
-						matrix[line][pos1Column] = '-';
-					}
-					foundWords.add(secretWord);
-					clear();
-					printMatrix();
-					printFoundWords();
-				}
-			}
-			
-			// check line
-			if(pos1Line == pos2Line && pos1Column != pos2Column) {
-				try {
-					for(int column = pos1Column; column <= pos2Column; column++) {
-						secretWord += matrix[pos1Line][column];
-					}
-				}
-				catch(ArrayIndexOutOfBoundsException e) {
-					System.out.println("Posição inválida!");
-					return false;
-				}
-				
-				if(words.contains(secretWord)) {
-					for(int column = pos1Column; column <= pos2Column; column++) {
-						matrix[pos1Line][column] = '-';
-					}
-					foundWords.add(secretWord);
-					clear();
-					printMatrix();
-					printFoundWords();
-				}
-			}
-			
-			if(foundWords.size() == 5) {
-				clear();
-				printWin();
-				printFoundWords();
-				System.exit(0);
-			}
-			
-			System.out.println();
-			return true;
-		}
-		
-		System.out.println("Posição ou entrada inválida!");
-		return false;
+	public List<String> getWords(){
+		return words;
 	}
 	
 	public void printMatrix() {
@@ -145,7 +37,14 @@ public class Table {
 		}
 	}
 	
-	private void fillWordList() {
+	private void loadContent() {
+		loadWordList();
+		loadMatrix();
+		loadRandomWords();
+	}
+
+	
+	private void loadWordList() {
 		try(Scanner scan = new Scanner(new File("util/words.txt"))){
 			while(scan.hasNext()) {
 				String line = scan.nextLine();
@@ -153,16 +52,27 @@ public class Table {
 			}
 		}
 		catch(IOException e) {
-			
+			System.err.println("Error reading archive 'util/words.txt'");
 		}
 	}
 	
-	private void setRandomWords() {
+	private void loadMatrix() {
+		Random r = new Random();
+		
+		for(int i = 0; i < matrix.length; i++) {
+			for(int j = 0; j < matrix[i].length; j++) {
+				//matrix[i][j] = ' ';
+				matrix[i][j] = (char) r.nextInt(65, 90);;
+			}	
+		}
+	}
+	
+	private void loadRandomWords() {
 		Random r = new Random();
 		int randomWordId = 0;
-		int i = 0;
+		int wordCount = 0;
 		
-		while(i < 10) {
+		while(wordCount < 10) {
 			randomWordId = r.nextInt(0, words.size() - 1);
 			String randomWord = words.get(randomWordId).toUpperCase();
 			
@@ -174,11 +84,11 @@ public class Table {
 					matrix[randomLine][column] = randomWord.charAt(charpos);
 				}
 			}
-			i++;
+			wordCount++;
 		}
 		
-		i = 0;
-		while(i < 5) {
+		wordCount = 0;
+		while(wordCount < 10) {
 			randomWordId = r.nextInt(0, words.size() - 1);
 			String randomWord = words.get(randomWordId).toUpperCase();
 			
@@ -190,18 +100,7 @@ public class Table {
 					matrix[line][randomColumn] = randomWord.charAt(charpos);
 				}
 			}
-			i++;
-		}
-	}
-	
-	private void initiateMatrix() {
-		Random r = new Random();
-		
-		for(int i = 0; i < matrix.length; i++) {
-			for(int j = 0; j < matrix[i].length; j++) {
-				matrix[i][j] = ' ';
-				//matrix[i][j] = (char) r.nextInt(65, 90);;
-			}	
+			wordCount++;
 		}
 	}
 }
