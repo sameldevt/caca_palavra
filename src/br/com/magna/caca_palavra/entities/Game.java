@@ -30,14 +30,28 @@ public class Game {
 		while(!isGameWon) {
 			TerminalHandler.clear();
 			t.printMatrix();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			printFoundWords();
 			
-			tryPosition();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			if(!tryPosition()) {
+				System.out.println("Posição ou entrada inválida!");
+			}
 			
 			if(verifyWinCondition()) {
 				TerminalHandler.clear();
 				TerminalHandler.printScreen(TerminalHandler.WIN);
-				printFoundWords();
 				isGameWon = true;
+				printFoundWords();
 			}
 		}
 	}
@@ -46,8 +60,7 @@ public class Game {
 		return foundWords.size() == 5;
 	}
 	
-	private void tryPosition() {
-		printFoundWords();
+	private boolean tryPosition() {
 		System.out.println("\nDigite as posições que deseja (Ex: a01 a12)");
 		System.out.print("> ");
 		
@@ -67,21 +80,23 @@ public class Game {
 				Integer pos2Line = map.get(pos2LineChar);
 	
 				if(!verifyPositions(pos1Line, pos2Line, pos1Column, pos2Column)) {
-					System.out.println("Posição inválida!");
-					return;
+					return false;
 				}
 				
-				return;
+				return true;
 			}
 		}	
 		catch(InputMismatchException e) {
-			System.out.println("Posição ou entrada inválida!");
-			return;
+			return false;
 		}
 		catch(NumberFormatException e) {
-			System.out.println("Entrada inválida!");
-			return ;
+			return false;
 		}
+		catch(NullPointerException e) {
+			return false;
+		}
+		
+		return false;
 	}
 	
 	private boolean verifyPositions(int pos1Line, int pos2Line, int pos1Column, int pos2Column) {
@@ -95,7 +110,6 @@ public class Game {
 				}
 			}
 			catch(ArrayIndexOutOfBoundsException e) {
-				System.out.println("Posição inválida!");
 				return false;
 			}
 			
@@ -140,12 +154,20 @@ public class Game {
 	}
 	
 	private void printFoundWords() {
+		if(!isGameWon) {
+			System.out.println("\nPossíveis palavras");
+			for(String s : words) {
+				System.out.print(s + " ");
+			}
+			System.out.println();
+		}
+		
+		System.out.println("\nPalavras encontradas");
 		for(String s : foundWords) {
-			System.out.print(s + " ");
+			System.err.print(s + " ");
 		}
 	}
 	
-
 	private void mapAlphabetToIndex() {
 		Character character = 65;
 		for(int i = 0; i < 26; i++) {

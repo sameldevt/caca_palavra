@@ -52,7 +52,7 @@ public class Table {
 			}
 		}
 		catch(IOException e) {
-			System.err.println("Error reading archive 'util/words.txt'");
+			throw new RuntimeException("Error reading archive 'util/words.txt'");
 		}
 	}
 	
@@ -61,8 +61,8 @@ public class Table {
 		
 		for(int i = 0; i < matrix.length; i++) {
 			for(int j = 0; j < matrix[i].length; j++) {
-				//matrix[i][j] = ' ';
-				matrix[i][j] = (char) r.nextInt(65, 90);;
+				matrix[i][j] = ' ';
+				//matrix[i][j] = (char) r.nextInt(65, 90);;
 			}	
 		}
 	}
