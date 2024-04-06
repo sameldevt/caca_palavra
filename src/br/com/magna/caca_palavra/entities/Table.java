@@ -30,6 +30,22 @@ public class Table {
 		for(int i = 0; i < matrix.length; i++) {
 			System.out.print(column + "  ");
 			for(int j = 0; j < matrix[i].length; j++) {
+				
+				if(Cursor.pin1[0] == i && Cursor.pin1[1] == j) {
+					System.out.print("{" + matrix[i][j] + "}");
+					continue;
+				}
+				
+				if(Cursor.pin2[0] == i && Cursor.pin2[1] == j) {
+					System.out.print("{" + matrix[i][j] + "}");
+					continue;
+				}
+				
+				if(Cursor.xPosition == i && Cursor.yPosition == j) {
+					System.out.print("{" + matrix[i][j] + "}");
+					continue;
+				}
+
 				System.out.print(" " + matrix[i][j] + " ");
 			}	
 			column++;
@@ -61,8 +77,8 @@ public class Table {
 		
 		for(int i = 0; i < matrix.length; i++) {
 			for(int j = 0; j < matrix[i].length; j++) {
-				matrix[i][j] = ' ';
-				//matrix[i][j] = (char) r.nextInt(65, 90);;
+				//matrix[i][j] = ' ';
+				matrix[i][j] = (char) r.nextInt(65, 90);;
 			}	
 		}
 	}
