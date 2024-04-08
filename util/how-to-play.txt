@@ -1,0 +1,46 @@
+   _____                          _                        
+  / ____|                        (_)                       
+ | |     ___  _ __ ___   ___      _  ___   __ _  __ _ _ __ 
+ | |    / _ \| '_ ` _ \ / _ \    | |/ _ \ / _` |/ _` | '__|
+ | |___| (_) | | | | | | (_) |   | | (_) | (_| | (_| | |   
+  \_____\___/|_| |_| |_|\___/    | |\___/ \__, |\__,_|_|   
+                                _/ |       __/ |           
+                               |__/       |___/            
+                                             
+Controles: 
+SETAS -> move o cursor
+ENTER -> marca uma posição na matriz
+ESC   -> remove todas as marcações da matriz		   
+
+Para selecionar uma posição, use as SETAS para mover o cursor até a posição desejada e pressione ENTER.
+Quando uma posição está selecionada, ela fica marcada com um par de chaves:
+
+    0  1  2  3  4  
+A  {R} O  S  A  Q 
+B   O  U  S  X  A 
+C   X  K  M  G  T 
+D   O  K  M  Y  K 
+E   T  X  Y  G  L 
+
+Após selecionar a posição inicial da palavra, selecione outra posição que representa o fim da mesma:
+
+    0  1  2  3  4  
+A  {R} O  S {A} Q 
+B   O  U  S  X  A 
+C   X  K  M  G  T 
+D   O  K  M  Y  K 
+E   T  X  Y  G  L 
+
+Aqui encontramos a palavra "ROSA". Quando encontramos uma palavra, ela é removida da matriz:
+
+    0  1  2  3  4  
+A   -  -  -  -  Q 
+B   O  U  S  X  A 
+C   X  K  M  G  T 
+D   O  K  M  Y  K 
+E   T  X  Y  G  L 
+
+Para vencer o jogo, você precisa achar cinco palavras na matriz. O jogo termina assim que as 
+cinco palavras são encontradas.
+
+Pressione alguma tecla para iniciar o jogo...

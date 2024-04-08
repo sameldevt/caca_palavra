@@ -8,112 +8,129 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Table {
-	
-	private char[][] matrix = new char[26][26];
+
+	private char[][] matrix;
 	private List<String> words = new ArrayList<String>();
-	
+
 	public Table() {
 		loadContent();
 	}
-	
-	public char[][] getMatrix(){
+
+	public char[][] updateMatrix(char[][] newMatrix) {
+		matrix = newMatrix;
+		loadGameMatrix();
+		loadRandomWords();
+		
 		return matrix;
 	}
 	
-	public List<String> getWords(){
-		return words;
+	private void loadContent() {
+		matrix = new char[5][5];
+		loadWordList();
+		loadGameMatrix();
+		loadRandomWords();
 	}
 	
+	public char[][] getMatrix() {
+		return matrix;
+	}
+
+	public List<String> getWords() {
+		return words;
+	}
+
 	public void printMatrix() {
-		char column = 65;
-		System.out.println("   00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25\n");
-		for(int i = 0; i < matrix.length; i++) {
+		char lineCharacter = 65;
+		
+		System.out.print("    ");
+		for(int column = 0; column < matrix.length; column++) {
+			if(column >= 9) {
+				System.out.print(column + " ");
+				continue;
+			}
 			System.out.print(column + "  ");
-			for(int j = 0; j < matrix[i].length; j++) {
-				
-				if(Cursor.pin1[0] == i && Cursor.pin1[1] == j) {
-					System.out.print("{" + matrix[i][j] + "}");
-					continue;
-				}
-				
-				if(Cursor.pin2[0] == i && Cursor.pin2[1] == j) {
-					System.out.print("{" + matrix[i][j] + "}");
-					continue;
-				}
-				
-				if(Cursor.xPosition == i && Cursor.yPosition == j) {
-					System.out.print("{" + matrix[i][j] + "}");
+		}
+		System.out.println();
+		
+		for (int line = 0; line < matrix.length; line++) {
+			System.out.print(lineCharacter + "  ");
+			for (int column = 0; column < matrix[line].length; column++) {
+
+				if (Cursor.pin1[0] == line && Cursor.pin1[1] == column) {
+					System.out.print("{" + matrix[line][column] + "}");
 					continue;
 				}
 
-				System.out.print(" " + matrix[i][j] + " ");
-			}	
-			column++;
+				if (Cursor.pin2[0] == line && Cursor.pin2[1] == column) {
+					System.out.print("{" + matrix[line][column] + "}");
+					continue;
+				}
+
+				if (Cursor.xPosition == line && Cursor.yPosition == column) {
+					System.out.print("{" + matrix[line][column] + "}");
+					continue;
+				}
+
+				System.out.print(" " + matrix[line][column] + " ");
+			}
+			lineCharacter++;
 			System.out.println();
 		}
 	}
-	
-	private void loadContent() {
-		loadWordList();
-		loadMatrix();
-		loadRandomWords();
+
+	private void loadGameMatrix() {
+		Random randomNumber = new Random();
+
+		for (int line = 0; line < matrix.length; line++) {
+			for (int column = 0; column < matrix[line].length; column++) {
+				//matrix[line][column] = ' ';
+				matrix[line][column] = (char) randomNumber.nextInt(65, 90);
+			}
+		}
 	}
 
-	
 	private void loadWordList() {
-		try(Scanner scan = new Scanner(new File("util/words.txt"))){
-			while(scan.hasNext()) {
+		try (Scanner scan = new Scanner(new File("util/words.txt"))) {
+			while (scan.hasNext()) {
 				String line = scan.nextLine();
 				words.add(line);
 			}
-		}
-		catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException("Error reading archive 'util/words.txt'");
 		}
 	}
 	
-	private void loadMatrix() {
-		Random r = new Random();
-		
-		for(int i = 0; i < matrix.length; i++) {
-			for(int j = 0; j < matrix[i].length; j++) {
-				//matrix[i][j] = ' ';
-				matrix[i][j] = (char) r.nextInt(65, 90);;
-			}	
-		}
-	}
-	
 	private void loadRandomWords() {
-		Random r = new Random();
+		Random radom = new Random();
 		int randomWordId = 0;
 		int wordCount = 0;
-		
-		while(wordCount < 10) {
-			randomWordId = r.nextInt(0, words.size() - 1);
+
+		while (wordCount < 10) {
+			randomWordId = radom.nextInt(0, words.size() - 1);
 			String randomWord = words.get(randomWordId).toUpperCase();
-			
-			int randomLine = r.nextInt(0, matrix.length);
-			int randomColumn = r.nextInt(0, matrix.length);
-			
-			if(matrix.length - randomColumn > randomWord.length()) {
-				for(int column = randomColumn, charpos = 0; charpos < randomWord.length(); column++, charpos++) {
-					matrix[randomLine][column] = randomWord.charAt(charpos);
+
+			int randomLine = radom.nextInt(0, matrix.length);
+			int randomColumn = radom.nextInt(0, matrix.length);
+
+			if (matrix.length - randomColumn > randomWord.length()) {
+				for (int column = randomColumn, charPos = 0; charPos < randomWord.length(); column++, charPos++) {
+					matrix[randomLine][column] = randomWord.charAt(charPos);
 				}
 			}
 			wordCount++;
 		}
-		
+
 		wordCount = 0;
-		while(wordCount < 10) {
-			randomWordId = r.nextInt(0, words.size() - 1);
+		while (wordCount < 10) {
+			randomWordId = radom.nextInt(0, words.size() - 1);
 			String randomWord = words.get(randomWordId).toUpperCase();
-			
-			int randomLine = r.nextInt(0, matrix.length);
-			int randomColumn = r.nextInt(0, matrix.length);
-			
-			if(matrix.length - randomLine > randomWord.length()) {
-				for(int line = randomLine, charpos = 0; charpos < randomWord.length(); line++, charpos++) {
-					matrix[line][randomColumn] = randomWord.charAt(charpos);
+
+			int randomLine = radom.nextInt(0, matrix.length);
+			int randomColumn = radom.nextInt(0, matrix.length);
+
+			if (matrix.length - randomLine > randomWord.length()) {
+				for (int line = randomLine, charPos = 0; charPos < randomWord.length(); line++, charPos++) {
+					matrix[line][randomColumn] = randomWord.charAt(charPos);
 				}
 			}
 			wordCount++;

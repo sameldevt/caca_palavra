@@ -3,117 +3,117 @@ package br.com.magna.caca_palavra.entities;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 
-public class Game extends JFrame implements KeyListener, Runnable{
+public class Game extends JFrame implements KeyListener{
 
 	private static final long serialVersionUID = 1L;
 	
-	private Table t = new Table();
-	//private Pattern regex = Pattern.compile("[a-zA-Z][0123456789]{2}");
-	//private Scanner scan = new Scanner(System.in);
+	private Table table = new Table();
+	private char[][] matrix = table.getMatrix();
+	private boolean isTutorial = true;
+	
 	public static Control keyPressed = null;
-
-	private List<String> words = t.getWords();
+	private List<String> words = table.getWords();
 	private List<String> foundWords = new ArrayList<String>();
-	private Map<Character, Integer> map = new HashMap<>();
 
-	private char[][] tableMatrix = t.getMatrix();
-	private boolean isGameWon = false;
-
+	private boolean verifyWinCondition() {
+		if(isTutorial) {
+			return foundWords.size() == 1 ? true : false;
+		}
+		
+		return foundWords.size() == 5 ? true : false;
+	}
+	
 	private void configGameFrame() {
-		setSize(100, 100);
 		addKeyListener(this);
 		setFocusable(true);
 		setVisible(true);
+		setSize(100, 100);
 	}
 	
 	public void start() {
-		mapAlphabetToIndex();
 		configGameFrame();
+		loadTutorialWord();
+		TerminalHandler.printScreen(TerminalHandler.HOW_TO_PLAY);
 	}
-	@Override
-	public void run() {
-		start();
+
+	private void loadTutorialWord() {
+		matrix[0][0] = 'A';
+		matrix[0][1] = 'Z';
+		matrix[0][2] = 'U';
+		matrix[0][3] = 'L';
 	}
-	@Override
-	public void keyTyped(KeyEvent e) {}
-	@Override
-	public void keyReleased(KeyEvent e) {}
 	@Override
 	public void keyPressed(KeyEvent e) {
-		move(e);
+		if(isTutorial) {
+			tutorialAction(e);
+			return;
+		}
+		
+		gameAction(e);
 	}
 	
-	private void move(KeyEvent e) {
+	private void tutorialAction(KeyEvent e) {
+		TerminalHandler.clear();
+		TerminalHandler.printScreen(TerminalHandler.TUTORIAL);
+		System.out.println("Encontre uma palavra na matriz abaixo");
+		try {
+			Control key = Control.lookup(e.getKeyCode());
+			
+			key.action();
+
+			verifyPositions(Cursor.pin1[0], Cursor.pin2[0], Cursor.pin1[1], Cursor.pin2[1]);
+			
+			if (verifyWinCondition()) {
+				TerminalHandler.clear();
+				endTutorial();
+				return;
+			}
+			
+			table.printMatrix();
+		}
+		catch(NullPointerException | InterruptedException ex) {
+			table.printMatrix();
+		}
+	}
+	
+	private void gameAction(KeyEvent e) {
 		TerminalHandler.clear();
 		try {
-			Control.lookup(e.getKeyCode()).action();
+			Control key = Control.lookup(e.getKeyCode());
 			
+			key.action();
+
 			verifyPositions(Cursor.pin1[0], Cursor.pin2[0], Cursor.pin1[1], Cursor.pin2[1]);
 			
 			if (verifyWinCondition()) {
 				TerminalHandler.clear();
 				TerminalHandler.printScreen(TerminalHandler.WIN);
-				isGameWon = true;
-				System.exit(0);
 				printFoundWords();
+				System.exit(0);
 			}
 			
-			t.printMatrix();
-			printFoundWords();
+			table.printMatrix();
+			printFoundWords();	
 		}
 		catch(NullPointerException | InterruptedException ex) {
-			
+			table.printMatrix();
+			printFoundWords();	
 		}
 	}
 	
-	private boolean verifyWinCondition() {
-		return foundWords.size() == 5;
+	private void endTutorial() {
+		matrix = table.updateMatrix(new char[26][26]);
+		foundWords.clear();
+		isTutorial = false;
+		Cursor.clearPins();
+		TerminalHandler.printScreen(TerminalHandler.WIN);
+		System.out.println("Você finalizou o tutorial!");
+		System.out.println("Pressione alguma tecla para começar o jogo");
 	}
-
-	/*
-	private boolean tryPosition() {
-		System.out.println("\nDigite as posições que deseja (Ex: a01 a12)");
-		System.out.print("> ");
-
-		try {
-			String input = scan.nextLine();
-
-			if (regex.matcher(input).find()) {
-				String formatedInput = input.toUpperCase();
-
-				Character pos1LineChar = formatedInput.charAt(0);
-				Integer pos1Column = Integer.parseInt(formatedInput.substring(1, 3));
-
-				Character pos2LineChar = formatedInput.charAt(4);
-				Integer pos2Column = Integer.parseInt(formatedInput.substring(5, 7));
-
-				Integer pos1Line = map.get(pos1LineChar);
-				Integer pos2Line = map.get(pos2LineChar);
-
-				if (!verifyPositions(pos1Line, pos2Line, pos1Column, pos2Column)) {
-					return false;
-				}
-
-				return true;
-			}
-		} catch (InputMismatchException e) {
-			return false;
-		} catch (NumberFormatException e) {
-			return false;
-		} catch (NullPointerException e) {
-			return false;
-		}
-
-		return false;
-	}
-	*/
 	
 	private boolean verifyPositions(int pos1Line, int pos2Line, int pos1Column, int pos2Column) {
 		String secretWord = "";
@@ -122,7 +122,7 @@ public class Game extends JFrame implements KeyListener, Runnable{
 		if (pos1Line != pos2Line && pos1Column == pos2Column) {
 			try {
 				for (int line = pos1Line; line <= pos2Line; line++) {
-					secretWord += tableMatrix[line][pos1Column];
+					secretWord += matrix[line][pos1Column];
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return false;
@@ -130,7 +130,7 @@ public class Game extends JFrame implements KeyListener, Runnable{
 
 			if (words.contains(secretWord)) {
 				for (int line = pos1Line; line <= pos2Line; line++) {
-					tableMatrix[line][pos1Column] = '-';
+					matrix[line][pos1Column] = '-';
 				}
 				Cursor.clearPins();
 				foundWords.add(secretWord);
@@ -142,7 +142,7 @@ public class Game extends JFrame implements KeyListener, Runnable{
 		else if (pos1Line == pos2Line && pos1Column != pos2Column) {
 			try {
 				for (int column = pos1Column; column <= pos2Column; column++) {
-					secretWord += tableMatrix[pos1Line][column];
+					secretWord += matrix[pos1Line][column];
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				return false;
@@ -150,7 +150,7 @@ public class Game extends JFrame implements KeyListener, Runnable{
 
 			if (words.contains(secretWord)) {
 				for (int column = pos1Column; column <= pos2Column; column++) {
-					tableMatrix[pos1Line][column] = '-';
+					matrix[pos1Line][column] = '-';
 				}
 				Cursor.clearPins();
 				foundWords.add(secretWord);
@@ -163,24 +163,26 @@ public class Game extends JFrame implements KeyListener, Runnable{
 	}
 
 	private void printFoundWords() {
-		if (!isGameWon) {
+		if (!verifyWinCondition()) {
 			System.out.println("\nPossíveis palavras");
-			for (String s : words) {
-				if (foundWords.contains(s)) {
-					System.out.print("{" + s + "} ");
+			for (String word : words) {
+				if (foundWords.contains(word)) {
+					System.out.print("{" + word + "} ");
 					continue;
 				}
-				System.out.print(s + " ");
+				System.out.print(word + " ");
 			}
 			System.out.println();
 		}
-	}
-
-	private void mapAlphabetToIndex() {
-		Character character = 65;
-		for (int i = 0; i < 26; i++) {
-			map.put(character, i);
-			character++;
+		
+		System.out.println("Palavras encontradas");
+		for(String word : foundWords) {
+			System.out.print(word + " ");
 		}
 	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {}
+	@Override
+	public void keyReleased(KeyEvent e) {}
 }
