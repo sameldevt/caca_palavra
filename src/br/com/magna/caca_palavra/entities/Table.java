@@ -83,8 +83,8 @@ public class Table {
 
 		for (int line = 0; line < matrix.length; line++) {
 			for (int column = 0; column < matrix[line].length; column++) {
-				//matrix[line][column] = ' ';
-				matrix[line][column] = (char) randomNumber.nextInt(65, 90);
+				matrix[line][column] = ' ';
+				//matrix[line][column] = (char) randomNumber.nextInt(65, 90);
 			}
 		}
 	}
