@@ -1,0 +1,34 @@
+   _____                          _                        
+  / ____|                        (_)                       
+ | |     ___  _ __ ___   ___      _  ___   __ _  __ _ _ __ 
+ | |    / _ \| '_ ` _ \ / _ \    | |/ _ \ / _` |/ _` | '__|
+ | |___| (_) | | | | | | (_) |   | | (_) | (_| | (_| | |   
+  \_____\___/|_| |_| |_|\___/    | |\___/ \__, |\__,_|_|   
+                                _/ |       __/ |           
+                               |__/       |___/            
+                                             
+
+Digite as coordenadas da posição inicial e final da palavra;
+
+    0  1  2  3  4  
+A  {R} O  S {A} Q 
+B   O  U  S  X  A 
+C   X  K  M  G  T 
+D   O  K  M  Y  K 
+E   T  X  Y  G  L 
+
+> a0 a3
+
+Aqui encontramos a palavra "ROSA". Quando encontramos uma palavra, ela é removida da matriz:
+
+    0  1  2  3  4  
+A   -  -  -  -  Q 
+B   O  U  S  X  A 
+C   X  K  M  G  T 
+D   O  K  M  Y  K 
+E   T  X  Y  G  L 
+
+Para vencer o jogo, você precisa achar cinco palavras na matriz. O jogo termina assim que as 
+cinco palavras são encontradas.
+
+Pressione ENTER para iniciar o jogo...

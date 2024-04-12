@@ -7,7 +7,9 @@ import java.util.Scanner;
 public class TerminalHandler {
 	
 	public static final String WIN = "util/win.txt";
-
+	public static final String TUTORIAL = "util/tutorial.txt";
+	public static final String HOW_TO_PLAY = "util/how-to-play.txt";
+	
 	public static void clear() {for(int i = 0; i<50; i++) {System.out.println();}}
 
 	public static void printScreen(String path) {
